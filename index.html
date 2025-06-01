@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Payment Method Selector</title>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    /* Preloader styles */
+    #preloader {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 9999;
+      background-color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      transition: opacity 0.5s ease;
+    }
+
+    .loader {
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #6064b6;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+    }
+    
+    .loader-text {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #6064b6;
+      font-weight: bold;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* Basic reset and styling */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      animation: fadeIn 0.8s ease;
+    }
+
+    .container {
+      width: 400px;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+      transform: translateY(0);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .title h4 {
+      font-size: 24px;
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+    
+    .title span {
+      color: #6064b6;
+      font-weight: 700;
+    }
+
+    form input[type="radio"] {
+      display: none;
+    }
+
+    .category {
+      margin-top: 10px;
+      padding-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-gap: 15px;
+    }
+
+    .scale:hover {
+      transform: scale(1.05);
+      transition: transform 0.3s ease;
+    }
+
+    label {
+      height: 145px;
+      padding: 20px;
+      box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.08);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      border-radius: 10px;
+      position: relative;
+      flex-direction: column;
+      background-color: #fff;
+      transition: all 0.3s ease;
+    }
+    
+    label:hover {
+      box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+      background-color: #f9f9ff;
+    }
+
+    .imgName {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .imgContainer img {
+      width: 60px;
+      height: 40px;
+      object-fit: contain;
+    }
+    
+    .imgName span {
+      font-size: 16px;
+      font-weight: 500;
+      color: #444;
+    }
+
+    .check {
+      display: none;
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .check i {
+      font-size: 22px;
+      color: #6064b6;
+    }
+
+    #visa:checked ~ .category .visaMethod,
+    #mastercard:checked ~ .category .mastercardMethod,
+    #paypal:checked ~ .category .paypalMethod,
+    #AMEX:checked ~ .category .amexMethod {
+      box-shadow: 0 0 0 2px #6064b6;
+      background-color: #f0f2ff;
+    }
+
+    #visa:checked ~ .category .visaMethod .check,
+    #mastercard:checked ~ .category .mastercardMethod .check,
+    #paypal:checked ~ .category .paypalMethod .check,
+    #AMEX:checked ~ .category .amexMethod .check {
+      display: block;
+    }
+
+    .btn-button {
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    .btn-button a {
+      padding: 14px 30px;
+      background: linear-gradient(135deg, #6064b6 0%, #3f43a6 100%);
+      color: white;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-weight: 600;
+      font-size: 16px;
+      letter-spacing: 0.5px;
+      display: inline-block;
+      box-shadow: 0 4px 15px rgba(96, 100, 182, 0.3);
+      border: none;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .btn-button a:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 7px 20px rgba(96, 100, 182, 0.4);
+      background: linear-gradient(135deg, #3f43a6 0%, #6064b6 100%);
+    }
+    
+    .btn-button a:active {
+      transform: translateY(1px);
+    }
+    
+    .payment-info {
+      margin-top: 25px;
+      padding: 15px;
+      background-color: #f9f9ff;
+      border-radius: 10px;
+      font-size: 14px;
+      color: #666;
+      text-align: center;
+      border: 1px dashed #ddd;
+    }
+    
+    .payment-info i {
+      color: #6064b6;
+      margin-right: 8px;
+    }
+    
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      color: #888;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Preloader -->
+<div id="preloader">
+  <div class="loader"></div>
+  <div class="loader-text">Loading Payment Options</div>
+</div>
+
+<!-- Page Content -->
+<div class="container">
+  <div class="title">
+    <h4>Select a <span>Payment</span> Method</h4>
+  </div>
+
+  <form action="#">
+    <input type="radio" name="payment" id="visa" checked>
+    <input type="radio" name="payment" id="mastercard">
+    <input type="radio" name="payment" id="paypal">
+    <input type="radio" name="payment" id="AMEX">
+
+    <div class="category">
+      <div class="scale">
+        <label for="visa" class="visaMethod">
+          <div class="imgName">
+            <div class="imgContainer">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/800px-Visa_Inc._logo.svg.png" alt="Visa">
+            </div>
+            <span>VISA</span>
+          </div>
+          <span class="check"><i class="fa-solid fa-circle-check"></i></span>
+        </label>
+      </div>
+
+      <div class="scale">
+        <label for="mastercard" class="mastercardMethod">
+          <div class="imgName">
+            <div class="imgContainer">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/800px-Mastercard-logo.svg.png" alt="Mastercard">
+            </div>
+            <span>Mastercard</span>
+          </div>
+          <span class="check"><i class="fa-solid fa-circle-check"></i></span>
+        </label>
+      </div>
+
+      <div class="scale">
+        <label for="paypal" class="paypalMethod">
+          <div class="imgName">
+            <div class="imgContainer">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/PayPal.svg/800px-PayPal.svg.png" alt="PayPal">
+            </div>
+            <span>PayPal</span>
+          </div>
+          <span class="check"><i class="fa-solid fa-circle-check"></i></span>
+        </label>
+      </div>
+
+      <div class="scale">
+        <label for="AMEX" class="amexMethod">
+          <div class="imgName">
+            <div class="imgContainer">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/American_Express_logo.svg/800px-American_Express_logo.svg.png" alt="American Express">
+            </div>
+            <span>AMEX</span>
+          </div>
+          <span class="check"><i class="fa-solid fa-circle-check"></i></span>
+        </label>
+      </div>
+    </div>
+    
+    <div class="payment-info">
+      <i class="fas fa-lock"></i> Your payment information is encrypted and secure
+    </div>
+
+    <div class="btn-button">
+      <a href="https://stripe.com/payments">Pay Now</a>
+    </div>
+  </form>
+  
+  <footer>
+    <p>© 2023 SecurePay. All rights reserved.</p>
+  </footer>
+</div>
+
+<!-- JS for preloader -->
+<script>
+  // Set minimum display time for preloader (1500ms)
+  const preloader = document.getElementById("preloader");
+  const startTime = Date.now();
+  const minDisplayTime = 1500;
+  
+  window.addEventListener("load", function() {
+    const elapsed = Date.now() - startTime;
+    const remaining = Math.max(minDisplayTime - elapsed, 0);
+    
+    setTimeout(function() {
+      preloader.style.opacity = "0";
+      setTimeout(function() {
+        preloader.style.display = "none";
+      }, 500);
+    }, remaining);
+  });
+  
+  // If page doesn't fully load, still hide preloader after 4 seconds
+  setTimeout(function() {
+    preloader.style.opacity = "0";
+    setTimeout(function() {
+      preloader.style.display = "none";
+    }, 500);
+  }, 4000);
+</script>
+
+</body>
+</html>
